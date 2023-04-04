@@ -1,0 +1,47 @@
+version: '3'
+services:
+  api:
+    image: eve-profiler
+    build: 
+      dockerfile: ./api/Dockerfile
+    networks:
+      - backend
+    ports:
+      - "3000:3000"
+
+  web-cli:
+    image: eve-profiler
+    networks:
+      - backend
+    command: sh
+
+  discord_bot:
+    image: flygoodbot
+    build: 
+      dockerfile: ./discord_bot/Dockerfile
+    networks:
+      - backend
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=caleb@zoolanders.space"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+networks:
+  backend:
+    driver: bridge
