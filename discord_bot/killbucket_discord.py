@@ -76,7 +76,7 @@ async def get_buckets(zkill_id):
     try:
         link = API_BASE_URL + "/character/" + str(char_id)
         async with aiohttp.ClientSession() as session:
-          async with session.get(link,auth=aiohttp.BasicAuth(user, password)) as r:
+          async with session.get(link,auth=aiohttp.BasicAuth(API_USER, API_PASS)) as r:
             if r.status == 200:
                 js = await r.json()
                 return js['kills']['pilots_involved']
