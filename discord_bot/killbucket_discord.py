@@ -23,6 +23,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 MIN_KILLS_IN_DAYS = int(os.getenv('MIN_KILLS_IN_DAYS'))
 API_BASE_URL = os.getenv('API_BASE_URL')
+API_USER=os.getenv('API_USER')
+API_PASS=os.genenv('API_PASS')
 
 logging.basicConfig(level=logging.DEBUG)
 intents = discord.Intents.default()
@@ -68,26 +70,13 @@ def char_id_lookup(char_name):
         logging.error('Error looking up char name ' + char_name, e)
 
 async def get_buckets(zkill_id):
-    # dictionary for how many pilots involved in killmails
-    page_num = 1
-    pilots_involved = {
-        "solo": 0,
-        "five": 0,
-        "ten": 0,
-        "fifteen": 0,
-        "twenty": 0,
-        "thirty": 0,
-        "forty": 0,
-        "fifty": 0,
-        "blob": 0,
-    }
     char_id = zkill_id 
     #input("Enter your character id from zkill: ")
     # set up initial webpage hit
     try:
         link = API_BASE_URL + "/character/" + str(char_id)
         async with aiohttp.ClientSession() as session:
-          async with session.get(link) as r:
+          async with session.get(link,auth=aiohttp.BasicAuth(user, password)) as r:
             if r.status == 200:
                 js = await r.json()
                 return js['kills']['pilots_involved']
