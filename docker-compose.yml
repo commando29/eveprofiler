@@ -2,51 +2,63 @@ version: '3'
 services:
   api:
     image: eve-profiler
+    container_name: api
     build: 
-      dockerfile: ./api/Dockerfile
+      dockerfile: Dockerfile
+      context: ./api
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.node-server.rule=Host(`<hostname>`)"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.node-server.rule=Host(`profilerapi.zoolanders.space`)"
       - "traefik.http.routers.node-server.entrypoints=websecure"
-      - "traefik.http.routers.node-server.tls.certresolver=myresolver"
+      - "traefik.http.routers.node-server.tls.certresolver=letsencrypt"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.redirs.entrypoints=web"
       - "traefik.http.routers.redirs.middlewares=redirect-to-https"
-
-  web-cli:
-    image: eve-profiler
-    networks:
+    networks: 
       - backend
-    command: sh
+      - web
+
+        #web-cli:
+        #image: eve-profiler
+        #networks:
+        #- backend
+        #command: sh
 
   discord_bot:
     image: flygoodbot
+    container_name: bot
     build: 
-      dockerfile: ./discord_bot/Dockerfile
+      dockerfile: Dockerfile
+      context: ./discord_bot
     networks:
       - backend
   traefik:
     image: "traefik:v2.9"
     container_name: "traefik"
     command:
-      - "--log.level=DEBUG"
+      - "--log.level=ERROR"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
-      - "--providers.docker.exposedbydefault=false"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=caleb@zoolanders.space"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+        #- "--certificatesresolvers.myresolver.acme.email=caleb@zoolanders.space"
+        #- "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "8080:8080"
+      - "443:443"
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - web
 networks:
   backend:
     driver: bridge
+  web:
+    external: true
