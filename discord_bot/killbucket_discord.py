@@ -24,7 +24,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 MIN_KILLS_IN_DAYS = int(os.getenv('MIN_KILLS_IN_DAYS'))
 API_BASE_URL = os.getenv('API_BASE_URL')
 API_USER=os.getenv('API_USER')
-API_PASS=os.genenv('API_PASS')
+API_PASS=os.getenv('API_PASS')
 
 logging.basicConfig(level=logging.DEBUG)
 intents = discord.Intents.default()
