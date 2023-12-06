@@ -26,7 +26,7 @@ API_BASE_URL = os.getenv('API_BASE_URL')
 API_USER=os.getenv('API_USER')
 API_PASS=os.getenv('API_PASS')
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)

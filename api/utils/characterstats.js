@@ -160,7 +160,7 @@ class CharacterStats {
                 if (!attChar.first_load_date) {
                     attChar.first_load_date = new Date();
                 }
-                else if (Math.round((right_now - attChar.first_load_date) / (1000 * 60 * 60 * 24)) > 14) {
+                else if (Math.round((right_now - attChar.first_load_date) / (1000 * 60 * 60 * 24)) > 1) {
                     attChar.clearStats();
                 }
             }
